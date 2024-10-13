@@ -3,17 +3,15 @@ const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
 //* REGISTER
 router.post("/", async (req, res) => {
-     console.log(req.body); // this run because there's app.use(express.json()); in the index.js
+    console.log(req.body); // this run because there's app.use(express.json()); in the index.js
 
     //destructuring
     try {
         const { username, email, password, passwordVerify } = req.body;
 
         //* validation
-
         if (!username || !email || !password || !passwordVerify) {
             return res
                 .status(400)
@@ -50,7 +48,6 @@ router.post("/", async (req, res) => {
                 });
         }
 
-
         //* email validation
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -60,7 +57,6 @@ router.post("/", async (req, res) => {
                     errorMessage: "An account with this email already exists.",
                 });
         }
-
 
         //* hash the password
         const salt = await bcrypt.genSalt();
@@ -75,7 +71,6 @@ router.post("/", async (req, res) => {
 
         const savedUser = await newUser.save();
 
-
         //* sign the token
         const token = jwt.sign({
             user: savedUser._id,
@@ -84,10 +79,11 @@ router.post("/", async (req, res) => {
         //* send the token in a HTTP-only cookie
         res.cookie("token", token, {
             httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
         }).send();
 
     } catch (error) {
-        console.error(error);
+        console.error("Register error:", error);
         res.status(500).send();
     }
 })
@@ -135,17 +131,16 @@ router.post("/login", async (req, res) => {
         }, process.env.JWT_SECRET);
 
         //* send the token in a HTTP-only cookie
-
         res.cookie("token", token, {
             httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
         }).send();
 
     } catch (error) {
-        console.error(error);
+        console.error("Login error:", error);
         res.status(500).send();
     }
 });
-
 
 router.get("/logout", (req, res) => {
     res.cookie("token", "", {
@@ -166,13 +161,13 @@ router.get("/loggedIn", (req, res) => {
 
         res.send(true);
 
-        
     } catch (error) {
+        console.error("LoggedIn error:", error);
         res.json(false);
     }
 });
 
-//* GEt user profile
+//* GET user profile
 router.get("/profile", async (req, res) => {
     try {
         const token = req.cookies.token;
@@ -188,9 +183,9 @@ router.get("/profile", async (req, res) => {
         res.json(user);
 
     } catch (error) {
+        console.error("Profile error:", error);
         res.json(null);
     }
 });
-
 
 module.exports = router;
