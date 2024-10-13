@@ -79,6 +79,8 @@ router.post("/", async (req, res) => {
         //* send the token in a HTTP-only cookie
         res.cookie("token", token, {
             httpOnly: true,
+            secure: true,
+            sameSite: "none",
         }).send();
 
     } catch (error) {
@@ -132,6 +134,8 @@ router.post("/login", async (req, res) => {
         //* send the token in a HTTP-only cookie
         res.cookie("token", token, {
             httpOnly: true,
+            secure: true,
+            sameSite: "none",
         }).send();
 
     } catch (error) {
@@ -144,6 +148,8 @@ router.get("/logout", (req, res) => {
     res.cookie("token", "", {
         httpOnly: true,
         expires: new Date(0),
+        secure: true,
+        sameSite: "none",
     }).send();
 });
 
