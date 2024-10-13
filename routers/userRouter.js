@@ -79,7 +79,8 @@ router.post("/", async (req, res) => {
         //* send the token in a HTTP-only cookie
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+            secure: process.env.NODE_ENV === 'production',
+            domain: ['localhost', 'aniweebserverdb.onrender.com', 'jvbarcenas.tech'],
         }).send();
 
     } catch (error) {
@@ -134,6 +135,7 @@ router.post("/login", async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+            domain: ['localhost', 'aniweebserverdb.onrender.com', 'jvbarcenas.tech'],
         }).send();
 
     } catch (error) {
@@ -146,6 +148,7 @@ router.get("/logout", (req, res) => {
     res.cookie("token", "", {
         httpOnly: true,
         expires: new Date(0),
+        domain: ['localhost', 'aniweebserverdb.onrender.com', 'jvbarcenas.tech'],
     }).send();
 });
 
