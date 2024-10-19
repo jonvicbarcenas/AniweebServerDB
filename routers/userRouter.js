@@ -192,4 +192,45 @@ router.get("/profile", async (req, res) => {
     }
 });
 
+//*update user profile
+router.put("/profile", async (req, res) => {   
+    try {
+        const token = req.cookies.token;
+
+        if (!token) {
+            return res.json(null);
+        }
+
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+
+        const user = await User.findById(verified.user);
+
+        if (req.body.username) {
+            user.username = req.body.username;
+        }
+        if (req.body.avatar) {
+            user.avatar = req.body.avatar;
+        }
+        if (req.body.password && req.body.password.length >= 6) {
+            const salt = await bcrypt.genSalt();
+            const passwordHash = await bcrypt.hash(req.body.password, salt);
+            user.passwordHash = passwordHash;
+        }else if (req.body.password && req.body.password.length < 6) {
+            return res
+                .status(400)
+                .json({
+                    errorMessage: "Please enter a password of at least 6 characters.",
+                });
+        }
+
+        await user.save();
+
+        res.json(user);
+
+    } catch (error) {
+        console.error("Profile error:", error);
+        res.json(null);
+    }
+}); 
+
 module.exports = router;
