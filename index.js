@@ -32,9 +32,9 @@ mongoose.connect(process.env.MDB_CONNECT)
     });
 
 // SET UP ROUTES
+app.use("/customer", require('./routers/customerRouter'));
 
 app.use("/auth", require('./routers/userRouter'));
-app.use("/customer", require('./routers/customerRouter'));
 app.use("/list", require('./routers/avatarRouter'));
 
 

@@ -2,6 +2,7 @@ const router = require('express').Router();
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const watchedRouter = require('./watchedRouter'); 
 
 //* REGISTER
 router.post("/", async (req, res) => {
@@ -15,7 +16,7 @@ router.post("/", async (req, res) => {
         if (!username || !email || !password || !passwordVerify) {
             return res
                 .status(400)
-                .json({ 
+                .json({
                     errorMessage: "Please enter all required fields."
                 });
         }
@@ -60,8 +61,8 @@ router.post("/", async (req, res) => {
 
         //* hash the password
         const salt = await bcrypt.genSalt();
-        const passwordHash = await bcrypt.hash(password, salt); 
-        
+        const passwordHash = await bcrypt.hash(password, salt);
+
         //* save a new user account to the db
         const newUser = new User({
             username,
@@ -98,7 +99,7 @@ router.post("/login", async (req, res) => {
         if (!email || !password) {
             return res
                 .status(400)
-                .json({ 
+                .json({
                     errorMessage: "Please enter all required fields."
                 });
         }
@@ -114,7 +115,7 @@ router.post("/login", async (req, res) => {
 
         //* checks the password to hashed password
         const passwordCorrect = await bcrypt.compare(
-            password, 
+            password,
             existingUser.passwordHash
         );
 
@@ -193,7 +194,7 @@ router.get("/profile", async (req, res) => {
 });
 
 //*update user profile
-router.put("/profile", async (req, res) => {   
+router.put("/profile", async (req, res) => {
     try {
         const token = req.cookies.token;
 
@@ -205,6 +206,13 @@ router.put("/profile", async (req, res) => {
 
         const user = await User.findById(verified.user);
 
+        //* update user config
+        if (req.body.config && req.body.config.autoskip) {
+            user.config.autoskip = req.body.config.autoskip;
+            console.log("user.config.autoskip", user.config.autoskip);
+        }
+
+        //* update user profile !!
         if (req.body.username) {
             user.username = req.body.username;
         }
@@ -215,7 +223,7 @@ router.put("/profile", async (req, res) => {
             const salt = await bcrypt.genSalt();
             const passwordHash = await bcrypt.hash(req.body.password, salt);
             user.passwordHash = passwordHash;
-        }else if (req.body.password && req.body.password.length < 6) {
+        } else if (req.body.password && req.body.password.length < 6) {
             return res
                 .status(400)
                 .json({
@@ -231,6 +239,9 @@ router.put("/profile", async (req, res) => {
         console.error("Profile error:", error);
         res.json(null);
     }
-}); 
+});
+
+// Use the watchedRouter for /profile/watched routes
+router.use(watchedRouter);
 
 module.exports = router;
