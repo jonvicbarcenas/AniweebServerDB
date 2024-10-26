@@ -82,6 +82,7 @@ router.post("/", async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: "none",
+            maxAge: 90 * 24 * 60 * 60 * 1000 // 90 days
         }).send();
 
     } catch (error) {
@@ -137,6 +138,7 @@ router.post("/login", async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: "none",
+            maxAge: 90 * 24 * 60 * 60 * 1000 // 90 days
         }).send();
 
     } catch (error) {
@@ -241,7 +243,7 @@ router.put("/profile", async (req, res) => {
     }
 });
 
-// Use the watchedRouter for /profile/watched routes
+//* Use the watchedRouter for /profile/watched routes
 router.use(watchedRouter);
 
 module.exports = router;
