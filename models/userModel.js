@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const animeSchema = require('./animeModel');
+const Anime = require('./animeModel');
 
 const userSchema = new mongoose.Schema({
     username: { 
@@ -40,7 +40,10 @@ const userSchema = new mongoose.Schema({
             default: 'English',
         },
     },
-    watchedAnimes: [animeSchema],
+    watchedAnimes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Anime'
+    }]
 });
 
 const User = mongoose.model("User", userSchema);

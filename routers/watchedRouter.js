@@ -1,9 +1,11 @@
 const router = require('express').Router();
-const User = require('../models/userModel');
+const User = require('../models/userModel'); // Import User model
+const Anime = require('../models/animeModel'); // Import Anime model
 const jwt = require('jsonwebtoken');
 
 //* Add watched anime
 router.post("/profile/watched", async (req, res) => {
+    console.log(req.body);
     try {
         const token = req.cookies.token;
 
@@ -12,34 +14,60 @@ router.post("/profile/watched", async (req, res) => {
         }
 
         const verified = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(verified.user);
+        const user = await User.findById(verified.user).populate('watchedAnimes');
 
-        const { id, episode, time } = req.body;
+        const { id, name, duration, poster, stats, episodes } = req.body;
 
-        if (!id || episode === undefined || time === undefined) {
+        if (!id || !name || !duration || !poster || !stats || !episodes) {
             return res.status(400).json({
-                errorMessage: "Please provide all required fields: id, episode, and time.",
+                errorMessage: "Please provide all required fields: id, name, duration, poster, stats, and episodes.",
             });
         }
 
-        // Convert episode to string
-        const episodeStr = episode.toString();
+        // Convert each episode number to string and ensure episodeId is included
+        const episodesWithStr = episodes.map(ep => ({
+            ...ep,
+            episodeId: ep.episodeId ? ep.episodeId.toString() : ep.episodeId,
+        }));
 
-        const existingAnime = user.watchedAnimes.find(anime => anime.id === id);
+        let existingAnime = user.watchedAnimes.find(anime => anime.id === id);
 
         if (existingAnime) {
-            // Filter out any duplicate episodes
-            existingAnime.episodes = existingAnime.episodes.filter(ep => ep.episode.toString() !== episodeStr);
+            // Process each episode from the request
+            episodesWithStr.forEach(newEpisode => {
+                const existingEpisodeId = existingAnime.episodes.findIndex(
+                    ep => ep.episodeId === newEpisode.episodeId
+                );
 
-            // Add the updated episode
-            existingAnime.episodes.push({ episode: episodeStr, time });
+                if (existingEpisodeId !== -1) {
+                    // If episodeId exists, only update the time
+                    existingAnime.episodes[existingEpisodeId].time = newEpisode.time;
+                } else {
+                    // If episodeId doesn't exist, add the new episode
+                    existingAnime.episodes.push(newEpisode);
+                }
+            });
+
+            // Sort episodes by episodeId
+            existingAnime.episodes.sort((a, b) => parseInt(a.episodeId) - parseInt(b.episodeId));
+            
+            await existingAnime.save();
         } else {
+            // Sort episodes before adding new anime
+            episodesWithStr.sort((a, b) => parseInt(a.episodeId) - parseInt(b.episodeId));
+
             // Add a new anime to the watched list
-            const newAnime = {
+            existingAnime = new Anime({
+                user: user._id,
                 id,
-                episodes: [{ episode: episodeStr, time }],
-            };
-            user.watchedAnimes.push(newAnime);
+                name,
+                duration,
+                poster,
+                stats,
+                episodes: episodesWithStr
+            });
+            await existingAnime.save();
+            user.watchedAnimes.push(existingAnime._id);
         }
 
         await user.save();
@@ -61,7 +89,7 @@ router.get("/profile/watched", async (req, res) => {
         }
 
         const verified = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(verified.user);
+        const user = await User.findById(verified.user).populate('watchedAnimes');
 
         res.json(user.watchedAnimes);
 
