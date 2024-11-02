@@ -27,7 +27,7 @@ router.post("/profile/watched", async (req, res) => {
         // Convert each episode number to string and ensure episodeId is included
         const episodesWithStr = episodes.map(ep => ({
             ...ep,
-            episodeId: ep.episodeId ? ep.episodeId.toString() : ep.episodeId,
+            episodeId: ep.episodeId.toString(),
         }));
 
         let existingAnime = user.watchedAnimes.find(anime => anime.id === id);
