@@ -13,7 +13,8 @@ router.get('/anime', async (req, res) => {
   try {
     const response = await axios.get(`https://jvbarcenas.tech/api/v2/hianime/episode/sources?animeEpisodeId=${animeEpisodeId}?ep=${ep}`);
     const { intro, outro } = response.data.data;
-    console.log(intro, outro);
+    
+    // console.log( req.query ,'\n',intro, outro);
 
     // Construct VTT format
     let vttContent = 'WEBVTT\n\n';

@@ -209,10 +209,16 @@ router.put("/profile", async (req, res) => {
 
         const user = await User.findById(verified.user);
 
-        //* update user config
+        //* update user config autoSkip
         if (req.body.config && req.body.config.autoskip) {
             user.config.autoskip = req.body.config.autoskip;
             console.log("user.config.autoskip", user.config.autoskip);
+        }
+
+        //* update user config autoPlay
+        if (req.body.config && req.body.config.autoplay) {
+            user.config.autoplay = req.body.config.autoplay;
+            console.log("user.config.autoplay", user.config.autoplay);
         }
 
         //* update user profile !!

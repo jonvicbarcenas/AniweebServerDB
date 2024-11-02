@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 //* Add watched anime
 router.post("/profile/watched", async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     try {
         const token = req.cookies.token;
 
