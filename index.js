@@ -36,6 +36,7 @@ app.use("/customer", require('./routers/customerRouter'));
 
 app.use("/auth", require('./routers/userRouter'));
 app.use("/list", require('./routers/avatarRouter'));
+app.use("/vtt", require('./routers/introVtt'));
 
 
 
