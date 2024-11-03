@@ -68,8 +68,8 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
         maxAge: 90 * 24 * 60 * 60 * 1000 // 90 days
     });
 
-    // Redirect to the frontend
-    res.redirect(`${process.env.THIS_URL}`);
+    // Redirect to the frontend origin
+    res.redirect(process.env.FRONTEND_ORIGIN);
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
