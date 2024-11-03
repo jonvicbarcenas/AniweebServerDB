@@ -68,9 +68,8 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
         maxAge: 90 * 24 * 60 * 60 * 1000 // 90 days
     });
 
-    // Redirect to the last visited page
-    res.redirect('jvbarcenas.tech');
-    
+    // Redirect to the frontend
+    res.redirect('https://jvbarcenas.tech');
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
