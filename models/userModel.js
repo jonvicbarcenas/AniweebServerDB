@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const Anime = require('./animeModel');
 
 const userSchema = new mongoose.Schema({
+    googleId: {
+        type: String,
+        unique: true,
+    },
     username: { 
         type: String, 
         required: true, 
@@ -16,7 +20,6 @@ const userSchema = new mongoose.Schema({
     },
     passwordHash: {
         type: String,
-        required: true,
     },
     config: {
         autoskip: {
