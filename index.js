@@ -69,7 +69,7 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     });
 
     // Redirect to the frontend
-    res.redirect('http://localhost:3000');
+    res.redirect(`${process.env.THIS_URL}`);
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
