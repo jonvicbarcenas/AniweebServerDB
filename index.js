@@ -69,7 +69,7 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     });
 
     // Redirect to the frontend
-    res.redirect('https://jvbarcenas.tech');
+    res.redirect('http://localhost:3000');
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
